@@ -9,12 +9,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def get_height_user():
-    """Get initial height of the ball from the user and validate it as a
-       number greater than 0
+def get_height_user(min, initial):
+    """Get height from the user and validate it as a number greater than 0
+
+    Args:
+        min (bool): requesting minimum height
+        initial (bool): requesting initial height
 
     Returns:
-        height (float): initial height of the ball
+        height (float): initial height or minimum height
     """
 
     # assume invalid input
@@ -24,21 +27,20 @@ def get_height_user():
     while not valid_input:
 
         # ask user for input
-        height = input("Please input the initial ball height:")
+        if initial: height = input("Please input the initial ball height:")
+        elif min: height = input("Please input the minimum height:")
         
         # check if input is number greater than 0
         try:
             value = float(height)
             if value >= 0:
-                break
+                return value
             else: 
                 print("Error: please input a number greater than 0")
         except:
             print("Error: please input a number")
 
-    return height
-
-def get_efficincy_user():
+def get_efficiency_user():
     """Get efficiency from the user and validate it as a number between 
        0 and 1  
 
@@ -53,27 +55,61 @@ def get_efficincy_user():
     while not valid_input:
 
         # ask user for input
-        efficiency = input("Please input the initial ball height:")
+        efficiency = input("Please input the efficiency:")
         
         # check if input is number between 0 and 1
         try:
             value = float(efficiency)
             if 0 <= value <= 1:
-                break
+                return value
             else: 
                 print("Error: please input a number between 0 and 1")
         except:
             print("Error: please input a number")
 
-    return efficiency
+def results(h_min, h_initial, bounces, time_taken):
+    """Print results
+
+    Args:
+        h_min (float): minimum height of interest
+        h_initial (float): initial height of the ball
+        bounces (int): number of bounces
+        time_taken (float): time taken
+    """
+    # print results
+    print("The initial height of the ball was {}".format(h_initial))
+    print("The minimum height of interest was {}".format(h_min))
+    print("The number of bounces was {}".format(bounces))
+    print("The time taken was {}".format(time_taken))
+
 
 def main():
     """Main function
     """
+    
+    # set gravitational constant
+    g = 9.8
 
     # get problem parameters from the user
-    initial_height = get_height_user()
-    efficiency = get_efficincy_user()
+    h_initial = get_height_user(False, True)
+    h_min = get_height_user(True, False)
+    efficiency = get_efficiency_user()
+
+    # handle edge cases
+    if h_initial == 0:
+        bounces = 0
+        time_taken = 0
+        results(h_min, h_initial, bounces, time_taken)
+    elif h_min == 0:
+        bounces = 'infinite'
+        time_taken = (np.sqrt(2*h_initial/g)*(1+np.sqrt(efficiency))
+                      /(1-np.sqrt(efficiency)))
+        results(h_min, h_initial, bounces, time_taken)
+    elif h_min >= h_initial:
+        bounces = 0
+        time_taken = np.sqrt(2*h_initial/g)
+        results(h_min, h_initial, bounces, time_taken)
+
 
 
 
