@@ -3,13 +3,26 @@
 # Email: christopher.kitching@postgrad.macnhester.ac.uk
 # Date created: 14/09/22
 # Date last edited: 14/09/22
-# Description: 
+# Description: A program to determine the number of bounces made by a ball,
+#              above some minimum height of interest, when dropped from an 
+#              initial height. The efficiency of the bounces and the
+#              gravitational constant are specified by the user. The user has
+#              the option to input their own grav constant or can select from 
+#              a series of predermined ones. All edge cases handled such as
+#              perfect efficinecy. In the case of sensible parameters an 
+#              animated graph has been drawn to display the trajectory.
+
 
 # IMPORTS
 import numpy as np
 import matplotlib.pyplot as plt
 
 def get_grav_constant_user():
+    """Get the gravitational constant from the user
+
+    Returns:
+        float: gravitational constant
+    """
 
     # ask user whether they want a custom g or to choose a planet
     custom_or_planet = input("Would you like a custom gravitational constant"\
@@ -198,10 +211,6 @@ def regular_cases(h_min, h_initial, efficiency, g):
 def main():
     """Main function
     """
-
-    # set gravitational constant
-    g = 9.8
-
     # get problem parameters from the user
     h_initial = get_height_user(False, True)
     h_min = get_height_user(True, False)
@@ -209,8 +218,8 @@ def main():
     grav_constant = get_grav_constant_user()
 
     # solve problem
-    edge_cases(h_min, h_initial, efficiency, g)
-    regular_cases(h_min, h_initial, efficiency, g)
+    edge_cases(h_min, h_initial, efficiency, grav_constant)
+    regular_cases(h_min, h_initial, efficiency, grav_constant)
 
     
 
