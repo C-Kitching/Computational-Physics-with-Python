@@ -137,8 +137,8 @@ def results(h_min, h_initial, efficiency, bounces, time_taken):
     if efficiency != 1:
         print("The time taken was {:.2f}s".format(time_taken))
     else:
-        print("The time taken was {}s".format(time_taken))
-        
+        print("The time taken was {}".format(time_taken))
+
 def edge_cases(h_min, h_initial, efficiency, g):
     """Handle edge cases
 
