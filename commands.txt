@@ -1,0 +1,6 @@
+PS1 ERRORS
+Set -ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser 
+
+SIP HAS NOT ATTRIBUTE SET API
+python -m pip install matplotlib==3.2

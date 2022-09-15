@@ -12,26 +12,102 @@
 #              perfect efficinecy. In the case of sensible parameters an 
 #              animated graph has been drawn to display the trajectory.
 
-
 # IMPORTS
 import numpy as np
 import matplotlib.pyplot as plt
 
-def get_grav_constant_user():
-    """Get the gravitational constant from the user
+class Experiment:
+    """Class to handle each experiment
 
-    Returns:
-        float: gravitational constant
+    Attributes:
+        h_min (float): minimum height of interest
+        h_initial (float): initial height of the ball
+        g (float): gravitational constant
+        efficiency (float): efficiency of each bounce
+
+    Methods:
+        get_height_user(): get height value from user
+        get_grav_constant_user(): get g from the user
+        get_efficiency(): get efficiency from the user
+        results(): print results of the experiment
+        edge_cases(): handle edge cases
+        regular_cases(): handle regular cases
+        solve(): solve experiment 
     """
 
-    # ask user whether they want a custom g or to choose a planet
-    custom_or_planet = input("Would you like a custom gravitational constant"\
-                             " or to choose a planet?:")
-    while custom_or_planet != 'custom' and custom_or_planet != 'planet':
-        custom_or_planet = input("Error: please input 'custom' or 'planet':")
+    def __init__(self):
+        """Constructs the object
+        """
+        self.h_min = Experiment.get_height_user(True, False)
+        self.h_initial = Experiment.get_height_user(False, True)
+        self.g = Experiment.get_grav_constant_user()
+        self.efficiency = Experiment.get_efficiency_user()
 
-    # get custom grav constant
-    if custom_or_planet == 'custom':
+    def get_grav_constant_user():
+        """Get the gravitational constant from the user
+
+        Returns:
+            float: gravitational constant
+        """
+
+        # ask user whether they want a custom g or to choose a planet
+        custom_or_planet = input("Would you like a custom gravitational constant"\
+                                " or to choose a planet?:")
+        while custom_or_planet != 'custom' and custom_or_planet != 'planet':
+            custom_or_planet = input("Error: please input 'custom' or 'planet':")
+
+        # get custom grav constant
+        if custom_or_planet == 'custom':
+
+            # assume invalid input
+            valid_input = False
+
+            # continuously ask for input while invalid
+            while not valid_input:
+
+                # ask user for input
+                grav_constant = input("Please input g(m/s^2):")
+                
+                # check if input is number greater than 0
+                try:
+                    value = float(grav_constant)
+                    if value >= 0:
+                        return value
+                    else: 
+                        print("Error: please input a positive number")
+                except:
+                    print("Error: please input a number")
+
+        # get planet specific grav constant
+        else:
+
+            # create a dictionary of planets
+            planet_dict = {'Mercury':3.59, 'Venus':8.87, 'Earth': 9.81, 
+                        'Moon': 1.62, 'Mars': 3.77, 'Jupiter': 25.95,
+                        'Saturn': 11.08, 'Uranus': 10.67, 'Neptune': 14.07,
+                        'Pluto': 0.42, 'Sun': 274.13}
+            
+            # get user to select a valid planet
+            print(planet_dict)
+            planet = input("Please select a body from the list above:")
+            while planet not in planet_dict:
+                print("ERROR: that body does not exist")
+                planet = input("Please select a body from the list above:")
+
+            # return corresponding grav constant
+            return planet_dict[planet]
+
+
+    def get_height_user(min, initial):
+        """Get height from the user and validate it as a number greater than 0
+
+        Args:
+            min (bool): requesting minimum height
+            initial (bool): requesting initial height
+
+        Returns:
+            height (float): initial height or minimum height
+        """
 
         # assume invalid input
         valid_input = False
@@ -40,190 +116,127 @@ def get_grav_constant_user():
         while not valid_input:
 
             # ask user for input
-            grav_constant = input("Please input g(m/s^2):")
+            if initial: height = input("Please input the initial ball height:")
+            elif min: height = input("Please input the minimum height:")
             
             # check if input is number greater than 0
             try:
-                value = float(grav_constant)
+                value = float(height)
                 if value >= 0:
                     return value
                 else: 
-                    print("Error: please input a positive number")
+                    print("Error: please input a number greater than or equal \
+                        to 0" )
             except:
                 print("Error: please input a number")
 
-    # get planet specific grav constant
-    else:
+    def get_efficiency_user():
+        """Get efficiency from the user and validate it as a number between 
+        0 and 1  
 
-        # create a dictionary of planets
-        planet_dict = {'Mercury':3.59, 'Venus':8.87, 'Earth': 9.81, 
-                       'Moon': 1.62, 'Mars': 3.77, 'Jupiter': 25.95,
-                       'Saturn': 11.08, 'Uranus': 10.67, 'Neptune': 14.07,
-                       'Pluto': 0.42, 'Sun': 274.13}
-        
-        # get user to select a valid planet
-        print(planet_dict)
-        planet = input("Please select a body from the list above:")
-        while planet not in planet_dict:
-            print("ERROR: that body does not exist")
-            planet = input("Please select a body from the list above:")
+        Returns:
+            efficiency (float): efficiency of the bounces
+        """
 
-        # return corresponding grav constant
-        return planet_dict[planet]
+        # assume invalid input
+        valid_input = False
 
+        # continuously ask for input while invalid
+        while not valid_input:
 
-def get_height_user(min, initial):
-    """Get height from the user and validate it as a number greater than 0
+            # ask user for input
+            efficiency = input("Please input the efficiency:")
+            
+            # check if input is number between 0 and 1
+            try:
+                value = float(efficiency)
+                if 0 <= value <= 1:
+                    return value
+                else: 
+                    print("Error: please input a number between 0 and 1")
+            except:
+                print("Error: please input a number")
 
-    Args:
-        min (bool): requesting minimum height
-        initial (bool): requesting initial height
+    def results(self, bounces, time_taken):
+        """Print results
 
-    Returns:
-        height (float): initial height or minimum height
-    """
+        Args:
+            bounces (int): number of bounces
+            time_taken (float): time taken
+        """
+        # print results
+        print("\nRESULTS")
+        print("The initial height of the ball was {}m".format(self.h_initial))
+        print("The minimum height of interest was {}m".format(self.h_min))
+        print("The efficiency of each bounce was {}".format(self.efficiency))
+        print("The number of bounces was {}".format(bounces))
+        if self.efficiency != 1:
+            print("The time taken was {:.2f}s".format(time_taken))
+        else:
+            print("The time taken was {}".format(time_taken))
 
-    # assume invalid input
-    valid_input = False
+    def edge_cases(self):
+        """Handle edge cases
+        """
 
-    # continuously ask for input while invalid
-    while not valid_input:
+        if self.h_initial == 0:
+            bounces = 0
+            time_taken = 0
+            Experiment.results(self, bounces, time_taken)
+        elif self.h_min == 0:
+            bounces = 'infinite'
+            time_taken = (np.sqrt(2*self.h_initial/self.g)
+                          *(1+np.sqrt(self.efficiency))
+                          /(1-np.sqrt(self.efficiency)))
+            Experiment.results(self, bounces, time_taken)
+        elif self.h_min >= self.h_initial:
+            bounces = 0
+            time_taken = np.sqrt(2*self.h_initial/self.g)
+            Experiment.results(self, bounces, time_taken)
+        elif self.efficiency == 1:
+            bounces = 'infinite'
+            time_taken = 'infinite'
+            Experiment.results(self, bounces, time_taken)
 
-        # ask user for input
-        if initial: height = input("Please input the initial ball height:")
-        elif min: height = input("Please input the minimum height:")
-        
-        # check if input is number greater than 0
-        try:
-            value = float(height)
-            if value >= 0:
-                return value
-            else: 
-                print("Error: please input a number greater than or equal \
-                       to 0" )
-        except:
-            print("Error: please input a number")
+    def regular_cases(self):
+        """Handle regular cases
 
-def get_efficiency_user():
-    """Get efficiency from the user and validate it as a number between 
-       0 and 1  
+        Args:
+            self (object): 
+        """
 
-    Returns:
-        efficiency (float): efficiency of the bounces
-    """
-
-    # assume invalid input
-    valid_input = False
-
-    # continuously ask for input while invalid
-    while not valid_input:
-
-        # ask user for input
-        efficiency = input("Please input the efficiency:")
-        
-        # check if input is number between 0 and 1
-        try:
-            value = float(efficiency)
-            if 0 <= value <= 1:
-                return value
-            else: 
-                print("Error: please input a number between 0 and 1")
-        except:
-            print("Error: please input a number")
-
-def results(h_min, h_initial, efficiency, bounces, time_taken):
-    """Print results
-
-    Args:
-        h_min (float): minimum height of interest
-        h_initial (float): initial height of the ball
-        efficiency (float): efficiency of each bounce
-        bounces (int): number of bounces
-        time_taken (float): time taken
-    """
-    # print results
-    print("\nRESULTS")
-    print("The initial height of the ball was {}m".format(h_initial))
-    print("The minimum height of interest was {}m".format(h_min))
-    print("The efficiency of each bounce was {}".format(efficiency))
-    print("The number of bounces was {}".format(bounces))
-    if efficiency != 1:
-        print("The time taken was {:.2f}s".format(time_taken))
-    else:
-        print("The time taken was {}".format(time_taken))
-
-def edge_cases(h_min, h_initial, efficiency, g):
-    """Handle edge cases
-
-    Args:
-        h_min (float): minimum height of interest
-        h_initial (float): initial ball height
-        efficiency (float): efficiency of each bounce
-        g (float): gravitational constant
-    """
-
-    if h_initial == 0:
+        # set bounce counter to 0
         bounces = 0
-        time_taken = 0
-        results(h_min, h_initial, efficiency, bounces, time_taken)
-    elif h_min == 0:
-        bounces = 'infinite'
-        time_taken = (np.sqrt(2*h_initial/g)*(1+np.sqrt(efficiency))
-                      /(1-np.sqrt(efficiency)))
-        results(h_min, h_initial, efficiency, bounces, time_taken)
-    elif h_min >= h_initial:
-        bounces = 0
-        time_taken = np.sqrt(2*h_initial/g)
-        results(h_min, h_initial, efficiency, bounces, time_taken)
-    elif efficiency == 1:
-        bounces = 'infinite'
-        time_taken = 'infinite'
-        results(h_min, h_initial, efficiency, bounces, time_taken)
 
-def regular_cases(h_min, h_initial, efficiency, g):
-    """Handle regular cases
+        # account for initial drop
+        time_taken = np.sqrt(2*self.h_initial/self.g)
 
-    Args:
-        h_min (float): minimum height of interest
-        h_initial (float): initial ball height
-        efficiency (float): efficiency of each bounce
-        g (float): gravitational constant
-    """
+        # determine height of first bounce
+        h = self.h_initial*self.efficiency
 
-    # set bounce counter to 0
-    bounces = 0
+        # while bounces are greater than h_min, append time and increment 
+        # counter
+        while h > self.h_min:
+            time_taken += 2*np.sqrt(2*h/self.g)
+            bounces += 1
+            h *= self.efficiency
 
-    # account for initial drop
-    time_taken = np.sqrt(2*h_initial/g)
+        # print final results
+        Experiment.results(self, bounces, time_taken)
 
-    # determine height of first bounce
-    h = h_initial*efficiency
-
-    # while bounces are greater than h_min, append time and increment counter
-    while h > h_min:
-        time_taken += 2*np.sqrt(2*h/g)
-        bounces += 1
-        h *= efficiency
-
-    # print final results
-    results(h_min, h_initial, efficiency, bounces, time_taken)
+    def solve(self):
+        """Solve the experiment
+        """
+        Experiment.edge_cases(self)
+        Experiment.regular_cases(self)
 
 def main():
     """Main function
     """
-    # get problem parameters from the user
-    h_initial = get_height_user(False, True)
-    h_min = get_height_user(True, False)
-    efficiency = get_efficiency_user()
-    grav_constant = get_grav_constant_user()
 
-    # solve problem
-    edge_cases(h_min, h_initial, efficiency, grav_constant)
-    regular_cases(h_min, h_initial, efficiency, grav_constant)
-
-    
-
-
+    # create experiment object and solve
+    experiment1 = Experiment()
+    experiment1.solve()
 
 # header guard
 if __name__ == "__main__":
