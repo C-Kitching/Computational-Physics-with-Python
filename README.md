@@ -19,7 +19,7 @@ Calculate:
 
 #### Notes on the solution
 
-Here I will outline the methodologies behind the solution (bouncy_ball.py).    
+Here I will outline the methodologies behind the solution (bouncing_balls.py).    
 The problem itself is very simple, but there are some interesting technicalities to discuss. There is alot of potential for creativity in this project and we explore this from both a physics and computational viewpoint.  
 
 
