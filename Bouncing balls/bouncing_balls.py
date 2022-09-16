@@ -15,6 +15,7 @@
 # IMPORTS
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import animation
 
 class Experiment:
     """Class to handle each experiment
@@ -235,7 +236,7 @@ class Experiment:
         """
 
         # number of data points per half bounce
-        points_per_bounce = 100
+        points_per_bounce = 10
 
         # calculate initial drop
         t = np.sqrt(2*self.h_initial/self.g)
@@ -278,19 +279,35 @@ class Experiment:
             times (float[]): corresponding times
         """
 
+        # set up graph
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(times, heights, label = 'Trajectory') # trajectory
-        ax.scatter(times[0], heights[0], color = 'green', 
-                   label = 'Initial position') # initial position
-        ax.scatter(times[-1], heights[-1], color = 'red', 
-                   label = 'Final position') # final position        
-        ax.hlines(self.h_min, times[0], times[-1], 
-                  label = r'$h_{min}$', linestyle = '--', 
-                  color = 'r') # min height
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Heights")
-        ax.legend()
+
+        def animate(i):
+            """animate the graph
+
+            Args:
+                i (int): position in the animation
+            """
+            ax.clear() # clear the plot
+            ax.scatter(times[0], heights[0], color = 'green', 
+                       label = 'Initial position') # initial position
+            ax.scatter(times[-1], heights[-1], color = 'red', 
+                       label = 'Final position') # final position        
+            ax.hlines(self.h_min, times[0], times[-1], 
+                      label = r'$h_{min}$', linestyle = '--', 
+                      color = 'r') # min height
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Heights")
+            ax.set_ylim(0, self.h_initial + 1)
+            ax.legend()
+            ax.plot(times[:i], heights[:i], color = 'b') # animated part
+
+        # animate
+        anim = animation.FuncAnimation(fig, animate, frames = len(times) + 1,
+                                        interval = 1, blit = False)
+        
+        # show graph
         plt.show()
 
 def main():
