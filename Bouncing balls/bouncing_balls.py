@@ -2,7 +2,7 @@
 # Name: Christopher Kitching
 # Email: christopher.kitching@postgrad.macnhester.ac.uk
 # Date created: 14/09/22
-# Date last edited: 14/09/22
+# Date last edited: 16/09/22
 # Description: A program to determine the number of bounces made by a ball,
 #              above some minimum height of interest, when dropped from an 
 #              initial height. The efficiency of the bounces and the
@@ -30,8 +30,6 @@ class Experiment:
         get_grav_constant_user(): get g from the user
         get_efficiency(): get efficiency from the user
         results(): print results of the experiment
-        edge_cases(): handle edge cases
-        regular_cases(): handle regular cases
         solve(): solve experiment 
     """
 
@@ -71,10 +69,10 @@ class Experiment:
                 # check if input is number greater than 0
                 try:
                     value = float(grav_constant)
-                    if value >= 0:
+                    if value > 0:
                         return value
                     else: 
-                        print("Error: please input a positive number")
+                        print("Error: please input a number greater than 0")
                 except:
                     print("Error: please input a number")
 
@@ -175,65 +173,129 @@ class Experiment:
         else:
             print("The time taken was {}".format(time_taken))
 
-    def edge_cases(self):
-        """Handle edge cases
+    def solve(self):
+        """Solve the experiment
         """
 
+        # handle edege cases
         if self.h_initial == 0:
             bounces = 0
             time_taken = 0
-            Experiment.results(self, bounces, time_taken)
+            self.results(bounces, time_taken)
         elif self.h_min == 0:
             bounces = 'infinite'
             time_taken = (np.sqrt(2*self.h_initial/self.g)
                           *(1+np.sqrt(self.efficiency))
                           /(1-np.sqrt(self.efficiency)))
-            Experiment.results(self, bounces, time_taken)
+            self.results(bounces, time_taken)
         elif self.h_min >= self.h_initial:
             bounces = 0
             time_taken = np.sqrt(2*self.h_initial/self.g)
-            Experiment.results(self, bounces, time_taken)
+            self.results(bounces, time_taken)
         elif self.efficiency == 1:
             bounces = 'infinite'
             time_taken = 'infinite'
-            Experiment.results(self, bounces, time_taken)
+            self.results(bounces, time_taken)
+        
+        # regular case
+        else:
 
-    def regular_cases(self):
-        """Handle regular cases
+            # set bounce counter to 0
+            bounces = 0
 
-        Args:
-            self (object): 
+            # account for initial drop
+            time_taken = np.sqrt(2*self.h_initial/self.g)
+
+            # determine height of first bounce
+            h = self.h_initial*self.efficiency
+
+            # while bounces are greater than h_min, append time and increment 
+            # counter
+            while h > self.h_min:
+                time_taken += 2*np.sqrt(2*h/self.g)
+                bounces += 1
+                h *= self.efficiency
+
+            # print final results
+            self.results(bounces, time_taken)
+
+        # get trajectory
+        heights, times = self.trajectory()
+
+        # plot trajectory
+        self.plot_trajectory(heights, times)
+
+
+    def trajectory(self):
+        """Calculate the trajectory of ball
+
+        Returns:
+            heights (float[]): heights of the ball
+            times (float[]): corresponding times
         """
 
-        # set bounce counter to 0
-        bounces = 0
+        # number of data points per half bounce
+        points_per_bounce = 100
 
-        # account for initial drop
-        time_taken = np.sqrt(2*self.h_initial/self.g)
+        # calculate initial drop
+        t = np.sqrt(2*self.h_initial/self.g)
+        times = np.linspace(0, t, points_per_bounce, endpoint = True)
+        heights = self.h_initial - 1/2*self.g*times**2
 
         # determine height of first bounce
         h = self.h_initial*self.efficiency
 
-        # while bounces are greater than h_min, append time and increment 
-        # counter
+        # calc trajectory until we fall below h_min
         while h > self.h_min:
-            time_taken += 2*np.sqrt(2*h/self.g)
-            bounces += 1
+
+            # time to fall from new height
+            t_fall = np.sqrt(2*h/self.g)
+            times_temp = np.linspace(0, t_fall, points_per_bounce)
+
+            # calculate height trajectories
+            fall_heights = h - 1/2*self.g*times_temp**2
+            rise_heights = np.flip(fall_heights)
+            arc_heights = np.concatenate((rise_heights, fall_heights))
+
+            # store height and time data
+            heights = np.concatenate((heights, arc_heights))
+            t_new = t + 2*t_fall
+            times = np.concatenate((times, np.linspace(t, t_new, 
+                                    2*points_per_bounce)))
+
+            # update time and height
+            t = t_new
             h *= self.efficiency
 
-        # print final results
-        Experiment.results(self, bounces, time_taken)
+        return heights, times
 
-    def solve(self):
-        """Solve the experiment
+    def plot_trajectory(self, heights, times):
+        """Plot an animated trajectory of the ball until it falls below 
+           h_min
+
+        Args:
+            heights (float[]): heights of the ball over the trajectory
+            times (float[]): corresponding times
         """
-        Experiment.edge_cases(self)
-        Experiment.regular_cases(self)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(times, heights, label = 'Trajectory') # trajectory
+        ax.scatter(times[0], heights[0], color = 'green', 
+                   label = 'Initial position') # initial position
+        ax.scatter(times[-1], heights[-1], color = 'red', 
+                   label = 'Final position') # final position        
+        ax.hlines(self.h_min, times[0], times[-1], 
+                  label = r'$h_{min}$', linestyle = '--', 
+                  color = 'r') # min height
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Heights")
+        ax.legend()
+        plt.show()
 
 def main():
     """Main function
     """
-
     # create experiment object and solve
     experiment1 = Experiment()
     experiment1.solve()
