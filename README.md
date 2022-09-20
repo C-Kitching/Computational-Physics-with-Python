@@ -21,7 +21,12 @@ Calculate:
 
 Here I will outline the methodologies behind the solution (bouncing_balls.py).    
 The problem itself is very simple, but there are some interesting technicalities to discuss. There is alot of potential for creativity in this project and we explore this from both a physics and computational viewpoint.  
-
+The code takes an object-orientated approach, defining a class called 'Experiment' which contains variables such as the initial ball height, minimum height and graviational constant.  
+Member functions have been created which ask the user to input values for these variables, all of which are checked for bad input such as non-numerical or non-physical.  
+For the graviational constant the user can choose to enter their own value or select a an object in the solar system whose gravitaional constant will be used.  
+A member function will then solve the scenario by calculating the number of bounces and the time take. Note that all edge cases are handled such as, perhaps the most interesting of which is the case when $h_{min}=0$, the ball will then bounce $\infty$ times but the time it takes to do this is actually finite and can be shown using geometric progression to be
+$$t_{h_{min}=0}=\sqrt{\frac{2h}{g}}\left[\frac{1+\sqrt{\eta}}{1-\sqrt{\eta}}\right].$$
+Finally, an animated plot is created to display the trajectory of the ball.
 
 ### 2. Nuclear decay
 
