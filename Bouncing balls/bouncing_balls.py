@@ -50,10 +50,11 @@ class Experiment:
         """
 
         # ask user whether they want a custom g or to choose a planet
-        custom_or_planet = input("Would you like a custom gravitational constant"\
-                                " or to choose a planet?:")
-        while custom_or_planet != 'custom' and custom_or_planet != 'planet':
-            custom_or_planet = input("Error: please input 'custom' or 'planet':")
+        custom_or_planet = input("Would you like a custom gravitational"\
+                                 " constant or to choose a planet?:")
+        while(custom_or_planet != 'custom' and custom_or_planet != 'planet'):
+            custom_or_planet = input("Error: please input 'custom' or"\
+                                     " \'planet':")
 
         # get custom grav constant
         if custom_or_planet == 'custom':
